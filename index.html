@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALFA STORE — Premium Fashion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="nav-logo" onclick="showPage('home')" id="navLogo">
+        <span class="logo-icon">◆</span>
+        <span class="logo-text">ALFA<span class="logo-accent">STORE</span></span>
+      </div>
+      <ul class="nav-menu" id="navMenu">
+        <li><a class="nav-link active" onclick="showPage('home')">Home</a></li>
+        <li><a class="nav-link" onclick="showPage('produk')">Produk</a></li>
+        <li><a class="nav-link" onclick="showPage('profil')">Profil</a></li>
+        <li><a class="nav-link admin-link" onclick="showAdminLogin()" style="display:none">⚙ Admin</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- LOADING -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <p>Memuat produk...</p>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: HOME ===== -->
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <p class="hero-sub">New Collection 2026</p>
+        <h1 class="hero-title">TEMUKAN<br/><em>style terbaikmu</em></h1>
+        <p class="hero-desc">Koleksi baju & celana premium pilihan, kualitas terjamin, harga terjangkau.</p>
+        <div class="hero-search">
+          <input type="text" id="heroSearch" placeholder="Cari produk fashion..." oninput="handleSearch(this.value)" />
+          <button onclick="doSearch()">🔍</button>
+        </div>
+        <div class="hero-filters">
+          <button class="filter-btn active" onclick="setFilter('kategori','semua',this)">Semua</button>
+          <button class="filter-btn" onclick="setFilter('kategori','baju',this)">👕 Baju</button>
+          <button class="filter-btn" onclick="setFilter('kategori','celana',this)">👖 Celana</button>
+          <button class="filter-btn" onclick="setFilter('kondisi','baru',this)">✨ Baru</button>
+          <button class="filter-btn" onclick="setFilter('kondisi','bekas',this)">♻️ Bekas</button>
+        </div>
+      </div>
+      <div class="hero-scroll-hint">↓ Scroll</div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Koleksi <em>Terbaru</em></h2>
+        <p>Barang Berkualitas Anda Pasti Suka</p>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🛍️</div>
+        <p>Produk tidak ditemukan</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== PAGE: PRODUK ===== -->
+  <div class="page" id="page-produk">
+    <section class="section" style="padding-top:100px">
+      <div class="section-header">
+        <h2>Semua <em>Produk</em></h2>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="produkSearch" placeholder="Cari produk..." oninput="handleSearch(this.value)" class="search-input" />
+        <select id="filterKategori" onchange="applyFilters()" class="filter-select">
+          <option value="">Semua Kategori</option>
+          <option value="baju">Baju</option>
+          <option value="celana">Celana</option>
+        </select>
+        <select id="filterKondisi" onchange="applyFilters()" class="filter-select">
+          <option value="">Semua Kondisi</option>
+          <option value="baru">Baru</option>
+          <option value="bekas">Bekas</option>
+        </select>
+        <select id="filterStatus" onchange="applyFilters()" class="filter-select">
+          <option value="">Semua Status</option>
+          <option value="tersedia">Tersedia</option>
+          <option value="sold">Sold Out</option>
+        </select>
+      </div>
+      <div class="product-grid" id="productGridAll"></div>
+      <div class="empty-state" id="emptyStateAll" style="display:none">
+        <div class="empty-icon">🛍️</div>
+        <p>Produk tidak ditemukan</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== PAGE: PROFIL ===== -->
+  <div class="page" id="page-profil">
+    <section class="section" style="padding-top:100px">
+      <div class="profil-card">
+        <div class="profil-avatar">◆</div>
+        <h2 class="profil-name">ALFA STORE</h2>
+        <p class="profil-tagline">Premium Fashion — Baju & Celana Pilihan</p>
+        <div class="profil-divider"></div>
+        <p class="profil-desc">Kami hadir untuk memenuhi kebutuhan fashion kamu dengan koleksi baju dan celana berkualitas. Setiap produk dipilih dengan teliti untuk memastikan kamu tampil percaya diri setiap hari.</p>
+        <div class="profil-contacts">
+          <a href="https://wa.me/628xxxxxxxxxx" target="_blank" class="contact-btn whatsapp">💬 WhatsApp Admin</a> 
+        </div>
+        <div class="profil-stats">
+          <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Total Produk</span></div>
+          <div class="stat"><span class="stat-num" id="statTersedia">0</span><span class="stat-label">Tersedia</span></div>
+          <div class="stat"><span class="stat-num" id="statSold">0</span><span class="stat-label">Terjual</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== PAGE: ADMIN ===== -->
+  <div class="page" id="page-admin">
+    <section class="section" style="padding-top:100px">
+      <div class="admin-header">
+        <div>
+          <h2>Panel <em>Admin</em></h2>
+          <p style="color:var(--gray);font-size:14px">Kelola produk toko kamu</p>
+        </div>
+        <button class="btn-gold" onclick="openAddModal()">+ Tambah Produk</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="adminTable">
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Ukuran</th>
+              <th>Kondisi</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== MODAL CHECKOUT ===== -->
+  <div class="modal-overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
+    <div class="modal modal-checkout">
+      <button class="modal-close" onclick="closeCheckoutDirect()">✕</button>
+      <div class="checkout-box">
+
+        <!-- Kiri: info produk -->
+        <div class="checkout-product" id="checkoutProduct"></div>
+
+        <!-- Kanan: form -->
+        <div class="checkout-form">
+          <p class="checkout-step">Langkah terakhir</p>
+          <h3 class="checkout-title">Lengkapi Pesanan</h3>
+
+          <div class="checkout-fields">
+            <div class="form-group">
+              <label>Nama Lengkap</label>
+              <input type="text" id="coNama" class="form-input" placeholder="Nama kamu..." />
+            </div>
+            <div class="form-group">
+              <label>Nomor HP / WhatsApp</label>
+              <input type="tel" id="coHP" class="form-input" placeholder="08xxxxxxxxxx" />
+            </div>
+            <div class="form-group">
+              <label>Alamat Lengkap</label>
+              <textarea id="coAlamat" class="form-input form-textarea" placeholder="Jl. Nama Jalan, No. Rumah, Kota, Kode Pos..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Pilih Ukuran</label>
+              <select id="coUkuran" class="form-input">
+                <option value="">-- Pilih ukuran --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Jumlah</label>
+              <select id="coJumlah" class="form-input">
+                <option value="1">1 pcs</option>
+                <option value="2">2 pcs</option>
+                <option value="3">3 pcs</option>
+                <option value="4">4 pcs</option>
+                <option value="5">5 pcs</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Catatan (opsional)</label>
+              <textarea id="coCatatan" class="form-input form-textarea" placeholder="Warna, permintaan khusus..."></textarea>
+            </div>
+          </div>
+
+          <button class="btn-pesan" onclick="submitPesan()">
+            <span id="pesanBtnText">Pesan Sekarang</span>
+          </button>
+          <p class="checkout-note">Data pesanan akan langsung tercatat & admin akan segera menghubungi kamu.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL PRODUK ===== -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="productModal">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ADMIN LOGIN ===== -->
+  <div class="modal-overlay" id="loginOverlay" onclick="closeLoginModal(event)">
+    <div class="modal modal-sm">
+      <button class="modal-close" onclick="document.getElementById('loginOverlay').classList.remove('open')">✕</button>
+      <div class="login-box">
+        <div class="login-icon">⚙</div>
+        <h3>Admin Login</h3>
+        <p>Masukkan password untuk akses panel admin</p>
+        <input type="password" id="adminPass" placeholder="Password admin..." class="login-input" onkeydown="if(event.key==='Enter')doAdminLogin()" />
+        <button class="btn-gold" style="width:100%" onclick="doAdminLogin()">Masuk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL EDIT / TAMBAH PRODUK ===== -->
+  <div class="modal-overlay" id="editOverlay" onclick="closeEditModal(event)">
+    <div class="modal modal-form">
+      <button class="modal-close" onclick="document.getElementById('editOverlay').classList.remove('open')">✕</button>
+      <div class="form-box">
+        <h3 id="formTitle">Tambah Produk</h3>
+        <input type="hidden" id="formId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nama Produk</label>
+            <input type="text" id="formNama" placeholder="Nama produk..." class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>Merk</label>
+            <input type="text" id="formMerk" placeholder="Merk..." class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>Kategori</label>
+            <select id="formKategori" class="form-input">
+              <option value="baju">Baju</option>
+              <option value="celana">Celana</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kondisi</label>
+            <select id="formKondisi" class="form-input">
+              <option value="Baru">Baru</option>
+              <option value="Bekas">Bekas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Harga</label>
+            <input type="text" id="formHarga" placeholder="Rp 150.000" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>Ukuran</label>
+            <input type="text" id="formUkuran" placeholder="S, M, L, XL" class="form-input" />
+          </div>
+          <div class="form-group form-full">
+            <label>URL Gambar</label>
+            <input type="text" id="formGambar" placeholder="https://..." class="form-input" />
+          </div>
+          <div class="form-group form-full">
+            <label>Deskripsi</label>
+            <textarea id="formDeskripsi" placeholder="Deskripsi produk..." class="form-input form-textarea"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="formStatus" class="form-input">
+              <option value="tersedia">Tersedia</option>
+              <option value="sold">Sold Out</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-outline" onclick="document.getElementById('editOverlay').classList.remove('open')">Batal</button>
+          <button class="btn-gold" onclick="saveProduct()">Simpan Produk</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
