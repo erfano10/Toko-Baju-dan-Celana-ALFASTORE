@@ -1,7 +1,7 @@
 // ===== KONFIGURASI =====
 const CONFIG = {
   sheetURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
-  waNumber: "628xxxxxxxxxx",
+  waNumber: "6285804742373",
   storeName: "ALFA STORE",
   scriptURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
   adminPassword: "admin123"
