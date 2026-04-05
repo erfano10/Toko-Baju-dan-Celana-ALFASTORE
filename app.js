@@ -283,7 +283,13 @@ function handleSearch(val) {
 }
 function doSearch() { const val = document.getElementById("heroSearch")?.value || ""; handleSearch(val); showPage("produk"); }
 function setFilter(type, val, btn) {
-  activeFilters[type] = val === "semua" ? "" : val;
+  // Reset filter lain yang sejenis
+  if (val === "semua") {
+    activeFilters.kategori = "";
+    activeFilters.kondisi = "";
+  } else {
+    activeFilters[type] = val;
+  }
   btn.closest(".hero-filters").querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   applyFilters();
