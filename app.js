@@ -126,7 +126,7 @@ function createCardHTML(p, i) {
   const isNew = isNewProduct(p.tanggal);
   const emoji = EMOJI[p.kategori] || EMOJI.default;
   const imgHTML = p.gambar
-    ? `<img src="${p.gambar}" alt="${p.nama}" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;color:transparent" />`
+    ? `<img src="${p.gambar}" alt="${p.nama}" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;color:transparent" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="card-img-placeholder" style="display:none">${emoji}</div>`
     : `<div class="card-img-placeholder">${emoji}</div>`;
   const soldOverlay = isSold ? `<div class="sold-overlay"><div class="sold-overlay-text">SOLD OUT</div><div class="sold-overlay-sub">Produk tidak tersedia</div></div>` : "";
   const badge = (!isSold && isNew) ? `<span class="card-badge badge-new">NEW</span>` : "";
@@ -153,7 +153,7 @@ function openModal(id) {
   const isSold = p.status === "sold" || p.status === "sold out";
   const emoji = EMOJI[p.kategori] || EMOJI.default;
   const imgHTML = p.gambar
-    ? `<img src="${p.gambar}" alt="${p.nama}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;color:transparent" />`
+    ? `<img src="${p.gambar}" alt="${p.nama}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;color:transparent" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="modal-img-placeholder" style="display:none">${emoji}</div>`
     : `<div class="modal-img-placeholder">${emoji}</div>`;
   const soldOverlay = isSold ? `<div class="modal-sold-overlay"><div class="modal-sold-text">SOLD OUT</div></div>` : "";
   document.getElementById("modalBody").innerHTML = `
