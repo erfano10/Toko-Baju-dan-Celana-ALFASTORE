@@ -1,7 +1,7 @@
 // ===== KONFIGURASI =====
 const CONFIG = {
   sheetURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
-  waNumber: "6285804742373",
+  waNumber: "",
   storeName: "ALFA STORE",
   scriptURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
   adminPassword: "admin123"
@@ -83,7 +83,7 @@ async function loadProducts() {
 
 function parseCSV(text) {
   const lines = text.trim().split("\n");
-  if (lines.length < 2) return [];
+  if (lines.length < 2) return [];tuk nomor handphone wa ke nomor ini 
   return lines.slice(1).map(line => {
     const col = parseCSVLine(line);
     return { id:col[0]?.trim()||"", nama:col[1]?.trim()||"", kategori:col[2]?.trim().toLowerCase()||"", gambar:col[3]?.trim()||"", ukuran:col[4]?.trim()||"", merk:col[5]?.trim()||"", kondisi:col[6]?.trim()||"", harga:col[7]?.trim()||"", status:col[8]?.trim().toLowerCase()||"tersedia", deskripsi:col[9]?.trim()||"", tanggal:col[10]?.trim()||"" };
