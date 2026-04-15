@@ -59,12 +59,16 @@ async function loadProducts() {
   if (localData) {
     try { allProducts = JSON.parse(localData); } catch(e) { allProducts = []; }
   }
+
+  // Fallback timeout: jika fetch terlalu lama, langsung pakai data lokal
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 5000));
+
   if (CONFIG.sheetURL.includes("YOUR_SHEET_ID")) {
     if (allProducts.length === 0) allProducts = [...SAMPLE_DATA];
     initApp(); showLoading(false); return;
   }
   try {
-    const res = await fetch(CONFIG.sheetURL);
+    const res = await Promise.race([fetch(CONFIG.sheetURL), timeout]);
     if (!res.ok) throw new Error();
     const text = await res.text();
     const sheetData = parseCSV(text);
