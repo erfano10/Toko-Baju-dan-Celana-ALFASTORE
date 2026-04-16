@@ -59,30 +59,9 @@ async function loadProducts() {
   if (localData) {
     try { allProducts = JSON.parse(localData); } catch(e) { allProducts = []; }
   }
-
-  // Fallback timeout: jika fetch terlalu lama, langsung pakai data lokal
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 5000));
-
-  if (CONFIG.sheetURL.includes("YOUR_SHEET_ID")) {
-    if (allProducts.length === 0) allProducts = [...SAMPLE_DATA];
-    initApp(); showLoading(false); return;
-  }
-  try {
-    const res = await Promise.race([fetch(CONFIG.sheetURL), timeout]);
-    if (!res.ok) throw new Error();
-    const text = await res.text();
-    const sheetData = parseCSV(text);
-    if (sheetData.length > 0) {
-      const localMap = {};
-      allProducts.forEach(p => { localMap[p.id] = p.status; });
-      allProducts = sheetData.map(p => ({ ...p, status: localMap[p.id] || p.status }));
-      saveLocal();
-    } else if (allProducts.length === 0) { allProducts = [...SAMPLE_DATA]; }
-  } catch {
-    if (allProducts.length === 0) allProducts = [...SAMPLE_DATA];
-    showToast("⚠️ Menggunakan data lokal");
-  }
-  initApp(); showLoading(false);
+  if (allProducts.length === 0) allProducts = [...SAMPLE_DATA];
+  initApp();
+  showLoading(false);
 }
 
 function parseCSV(text) {
