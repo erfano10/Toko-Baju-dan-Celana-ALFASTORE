@@ -4,7 +4,7 @@ const CONFIG = {
   waNumber: "6281234567890", // Ganti dengan nomor WA kamu (format: 628xxx)
   storeName: "ALFA STORE",
   scriptURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
-  driveUploadURL: "GANTI_DENGAN_URL_APPS_SCRIPT_KAMU", // URL deployment Apps Script untuk upload ke Drive
+  driveUploadURL: "https://script.google.com/macros/s/AKfycbxZFTlJWxphY_QhrQ8yHN9emXlCUBZpYvJliSxNLNVLMm0KOQ4WEkPRglo9JKxbbalPng/exec",
   adminPassword: "admin123",
   pembayaran: {
     dana: { nomor: "0812-3456-7890", nama: "Nama Pemilik DANA" },
