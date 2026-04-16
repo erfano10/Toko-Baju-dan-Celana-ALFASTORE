@@ -4,6 +4,7 @@ const CONFIG = {
   waNumber: "6281234567890", // Ganti dengan nomor WA kamu (format: 628xxx)
   storeName: "ALFA STORE",
   scriptURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
+  driveUploadURL: "GANTI_DENGAN_URL_APPS_SCRIPT_KAMU", // URL deployment Apps Script untuk upload ke Drive
   adminPassword: "admin123",
   pembayaran: {
     dana: { nomor: "0812-3456-7890", nama: "Nama Pemilik DANA" },
@@ -263,13 +264,34 @@ async function submitPesan() {
 
   const btn = document.querySelector(".btn-pesan");
   btn.disabled = true;
-  document.getElementById("pesanBtnText").textContent = "Memproses...";
+  document.getElementById("pesanBtnText").textContent = "Mengupload bukti...";
 
   const jml = parseInt(jumlah) || 1;
   const hargaAngka = parseInt(p.harga.replace(/[^0-9]/g, "")) || 0;
   const totalHarga = hargaAngka * jml;
   const totalFormatted = "Rp " + totalHarga.toLocaleString("id-ID");
   const labelMetode = metode === "dana" ? "DANA" : metode === "bni" ? "Bank BNI" : "Bank BRI";
+
+  // Upload bukti ke Google Drive
+  let driveLinkText = "_(gagal upload, kirim manual)_";
+  try {
+    const base64 = await fileToBase64(bukti);
+    const payload = {
+      file: base64.split(",")[1],
+      mimeType: bukti.type,
+      fileName: `bukti_${nama.replace(/\s/g,"_")}_${Date.now()}.${bukti.name.split(".").pop()}`
+    };
+    const res = await fetch(CONFIG.driveUploadURL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (result.url) driveLinkText = result.url;
+  } catch(err) {
+    console.warn("Upload Drive gagal:", err);
+  }
+
+  document.getElementById("pesanBtnText").textContent = "Memproses...";
 
   // Kirim ke WhatsApp
   const waMsg = encodeURIComponent(
@@ -287,7 +309,7 @@ async function submitPesan() {
 💳 *Pembayaran:* ${labelMetode}
 ${catatan ? `📝 *Catatan:* ${catatan}` : ""}
 ━━━━━━━━━━━━━━━━━━
-_Bukti pembayaran terlampir_`
+🧾 *Bukti Bayar:* ${driveLinkText}`
   );
   const waURL = `https://wa.me/${CONFIG.waNumber}?text=${waMsg}`;
 
@@ -296,20 +318,29 @@ _Bukti pembayaran terlampir_`
     <button class="modal-close" onclick="closeCheckoutDirect()">✕</button>
     <div class="checkout-success">
       <div class="success-icon">✅</div>
-      <h3 class="success-title">Pesanan Siap Dikirim!</h3>
-      <p class="success-desc">Terima kasih <strong>${nama}</strong>! Klik tombol di bawah untuk kirim pesanan + bukti bayar ke WhatsApp admin.</p>
+      <h3 class="success-title">Pesanan Siap!</h3>
+      <p class="success-desc">Bukti pembayaran berhasil diupload. Klik tombol di bawah untuk kirim pesanan ke WhatsApp admin.</p>
       <div class="success-detail">
         <p>Produk: <span>${p.nama}</span></p>
         <p>Ukuran: <span>${ukuran}</span></p>
         <p>Jumlah: <span>${jml} pcs</span></p>
         <p>Total: <span>${totalFormatted}</span></p>
         <p>Pembayaran: <span>${labelMetode}</span></p>
+        <p>Bukti: <span><a href="${driveLinkText}" target="_blank" style="color:var(--green)">Lihat di Drive</a></span></p>
       </div>
       <a href="${waURL}" target="_blank" class="btn-wa-kirim">💬 Kirim ke WhatsApp Admin</a>
-      <p style="font-size:12px;color:var(--gray2);margin-top:8px">Jangan lupa lampirkan foto bukti pembayaran saat chat WA</p>
       <button class="btn-tutup" onclick="closeCheckoutDirect()" style="margin-top:8px">Tutup</button>
     </div>`;
-  showToast("✅ Pesanan siap! Lanjut ke WhatsApp.");
+  showToast("✅ Bukti terupload! Lanjut ke WhatsApp.");
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 
