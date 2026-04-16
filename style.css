@@ -546,6 +546,33 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--whi
 }
 .btn-tutup:hover { background: var(--gold3); }
 
+/* ===== INFO BAYAR ===== */
+.info-bayar-box {
+  background: var(--bg4); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.info-bayar-label { font-size: 12px; font-weight: 700; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+.info-bayar-nomor { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: 1px; }
+.info-bayar-nama { font-size: 13px; color: var(--gray); }
+.btn-copy {
+  margin-top: 4px; padding: 8px 16px; border-radius: var(--radius-xs);
+  background: var(--gold-dim); border: 1px solid var(--border);
+  color: var(--white); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s; width: fit-content;
+}
+.btn-copy:hover { background: var(--white); color: #0a0a0a; }
+
+/* ===== TOMBOL WA ===== */
+.btn-wa-kirim {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 32px; border-radius: var(--radius-sm);
+  background: #25d366; color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 700;
+  text-decoration: none; transition: all 0.3s; width: 100%;
+}
+.btn-wa-kirim:hover { background: #1ebe5d; transform: translateY(-2px); }
+
 @media (max-width: 640px) {
   .checkout-box { grid-template-columns: 1fr; }
   .checkout-product { border-radius: var(--radius) var(--radius) 0 0; border-right: none; border-bottom: 1px solid var(--border2); }

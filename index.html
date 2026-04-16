@@ -200,6 +200,21 @@
               </select>
             </div>
             <div class="form-group">
+              <label>Metode Pembayaran</label>
+              <select id="coMetodeBayar" class="form-input" onchange="tampilInfoBayar()">
+                <option value="">-- Pilih metode --</option>
+                <option value="dana">💙 DANA</option>
+                <option value="bni">🟠 Bank BNI</option>
+                <option value="bri">🔵 Bank BRI</option>
+              </select>
+            </div>
+            <div id="infoBayar" style="display:none"></div>
+            <div class="form-group">
+              <label>Upload Bukti Pembayaran</label>
+              <input type="file" id="buktiPembayaran" class="form-input" accept="image/*" onchange="previewBukti(this)" />
+              <img id="buktiPreview" style="display:none;width:100%;border-radius:8px;margin-top:8px;max-height:160px;object-fit:cover" alt="Preview bukti" />
+            </div>
+            <div class="form-group">
               <label>Catatan (opsional)</label>
               <textarea id="coCatatan" class="form-input form-textarea" placeholder="Warna, permintaan khusus..."></textarea>
             </div>

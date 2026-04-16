@@ -1,10 +1,15 @@
 // ===== KONFIGURASI =====
 const CONFIG = {
   sheetURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
-  waNumber: "",
+  waNumber: "6281234567890", // Ganti dengan nomor WA kamu (format: 628xxx)
   storeName: "ALFA STORE",
   scriptURL: "https://script.google.com/macros/s/AKfycbxJy11EQXBByYj9KbJR_dnu6t2sYCyUwhLLMqn5fSERYKu1FZ8F9RMQm1DxwAr_dZBXcg/exec",
-  adminPassword: "admin123"
+  adminPassword: "admin123",
+  pembayaran: {
+    dana: { nomor: "0812-3456-7890", nama: "Nama Pemilik DANA" },
+    bni:  { nomor: "1234567890",     nama: "Nama Pemilik BNI"  },
+    bri:  { nomor: "123456789012345", nama: "Nama Pemilik BRI" }
+  }
 };
 
 // ===== STATE =====
@@ -184,7 +189,11 @@ async function ambilProduk(id) {
   document.getElementById("coAlamat").value = "";
   document.getElementById("coJumlah").value = "1";
   document.getElementById("coCatatan").value = "";
-  document.getElementById("pesanBtnText").textContent = "Pesan Sekarang";
+  document.getElementById("coMetodeBayar").value = "";
+  document.getElementById("buktiPembayaran").value = "";
+  document.getElementById("buktiPreview").style.display = "none";
+  document.getElementById("infoBayar").style.display = "none";
+  document.getElementById("pesanBtnText").textContent = "Lanjut ke Pembayaran";
   document.querySelector(".btn-pesan").disabled = false;
   currentProduct = p;
   document.getElementById("checkoutOverlay").classList.add("open");
@@ -198,60 +207,109 @@ function closeCheckoutDirect() {
   document.body.style.overflow = "";
 }
 
+// ===== TAMPILKAN INFO REKENING =====
+function tampilInfoBayar() {
+  const metode = document.getElementById("coMetodeBayar").value;
+  const info = document.getElementById("infoBayar");
+  if (!metode) { info.style.display = "none"; return; }
+  const data = CONFIG.pembayaran[metode];
+  const icon = metode === "dana" ? "💙" : metode === "bni" ? "🟠" : "🔵";
+  const label = metode === "dana" ? "DANA" : metode === "bni" ? "Bank BNI" : "Bank BRI";
+  info.style.display = "block";
+  info.innerHTML = `
+    <div class="info-bayar-box">
+      <div class="info-bayar-label">${icon} Transfer ke ${label}</div>
+      <div class="info-bayar-nomor">${data.nomor}</div>
+      <div class="info-bayar-nama">a.n. ${data.nama}</div>
+      <button class="btn-copy" onclick="copyNomor('${data.nomor}')">📋 Salin Nomor</button>
+    </div>`;
+}
+
+function copyNomor(nomor) {
+  navigator.clipboard.writeText(nomor).then(() => showToast("✅ Nomor disalin!"));
+}
+
+function previewBukti(input) {
+  const file = input.files[0];
+  const preview = document.getElementById("buktiPreview");
+  if (!file) { preview.style.display = "none"; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    preview.src = e.target.result;
+    preview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
 // ===== SUBMIT PESANAN =====
 async function submitPesan() {
   const p = currentProduct;
   if (!p) return;
-  const nama   = document.getElementById("coNama").value.trim();
-  const hp     = document.getElementById("coHP").value.trim();
-  const alamat = document.getElementById("coAlamat").value.trim();
-  const ukuran = document.getElementById("coUkuran").value;
-  const jumlah = document.getElementById("coJumlah").value || "1";
+  const nama    = document.getElementById("coNama").value.trim();
+  const hp      = document.getElementById("coHP").value.trim();
+  const alamat  = document.getElementById("coAlamat").value.trim();
+  const ukuran  = document.getElementById("coUkuran").value;
+  const jumlah  = document.getElementById("coJumlah").value || "1";
   const catatan = document.getElementById("coCatatan").value.trim();
+  const metode  = document.getElementById("coMetodeBayar").value;
+  const bukti   = document.getElementById("buktiPembayaran").files[0];
+
   if (!nama)   { showToast("⚠️ Nama wajib diisi!"); return; }
   if (!hp)     { showToast("⚠️ Nomor HP wajib diisi!"); return; }
   if (!alamat) { showToast("⚠️ Alamat wajib diisi!"); return; }
   if (!ukuran) { showToast("⚠️ Pilih ukuran dulu!"); return; }
+  if (!metode) { showToast("⚠️ Pilih metode pembayaran!"); return; }
+  if (!bukti)  { showToast("⚠️ Upload bukti pembayaran dulu!"); return; }
+
   const btn = document.querySelector(".btn-pesan");
   btn.disabled = true;
   document.getElementById("pesanBtnText").textContent = "Memproses...";
+
   const jml = parseInt(jumlah) || 1;
   const hargaAngka = parseInt(p.harga.replace(/[^0-9]/g, "")) || 0;
   const totalHarga = hargaAngka * jml;
   const totalFormatted = "Rp " + totalHarga.toLocaleString("id-ID");
-  const payload = { nama, hp, alamat, ukuran, catatan: catatan||"-", nama_produk:p.nama, kategori:p.kategori, merk:p.merk, harga:totalFormatted, jumlah:jml, deskripsi:p.deskripsi||"-", tanggal:new Date().toLocaleString("id-ID") };
-  let berhasil = false;
-  if (CONFIG.scriptURL) {
-    try {
-      await fetch(CONFIG.scriptURL, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body:JSON.stringify(payload) });
-      berhasil = true;
-    } catch(e) { berhasil = false; }
-  } else {
-    const riwayat = JSON.parse(localStorage.getItem("noirstore_pesanan") || "[]");
-    riwayat.push(payload);
-    localStorage.setItem("noirstore_pesanan", JSON.stringify(riwayat));
-    berhasil = true;
-  }
+  const labelMetode = metode === "dana" ? "DANA" : metode === "bni" ? "Bank BNI" : "Bank BRI";
+
+  // Kirim ke WhatsApp
+  const waMsg = encodeURIComponent(
+`*PESANAN BARU - ${CONFIG.storeName}*
+━━━━━━━━━━━━━━━━━━
+🛍️ *Produk:* ${p.nama}
+🏷️ *Merk:* ${p.merk}
+📏 *Ukuran:* ${ukuran}
+🔢 *Jumlah:* ${jml} pcs
+💰 *Total:* ${totalFormatted}
+━━━━━━━━━━━━━━━━━━
+👤 *Nama:* ${nama}
+📱 *HP:* ${hp}
+📍 *Alamat:* ${alamat}
+💳 *Pembayaran:* ${labelMetode}
+${catatan ? `📝 *Catatan:* ${catatan}` : ""}
+━━━━━━━━━━━━━━━━━━
+_Bukti pembayaran terlampir_`
+  );
+  const waURL = `https://wa.me/${CONFIG.waNumber}?text=${waMsg}`;
+
   const modal = document.getElementById("checkoutOverlay").querySelector(".modal-checkout");
   modal.innerHTML = `
     <button class="modal-close" onclick="closeCheckoutDirect()">✕</button>
     <div class="checkout-success">
       <div class="success-icon">✅</div>
-      <h3 class="success-title">Pesanan Diterima!</h3>
-      <p class="success-desc">Terima kasih <strong>${nama}</strong>, pesananmu sudah tercatat. Admin akan segera menghubungi kamu di nomor <strong>${hp}</strong>.</p>
+      <h3 class="success-title">Pesanan Siap Dikirim!</h3>
+      <p class="success-desc">Terima kasih <strong>${nama}</strong>! Klik tombol di bawah untuk kirim pesanan + bukti bayar ke WhatsApp admin.</p>
       <div class="success-detail">
         <p>Produk: <span>${p.nama}</span></p>
         <p>Ukuran: <span>${ukuran}</span></p>
         <p>Jumlah: <span>${jml} pcs</span></p>
-        <p>Harga satuan: <span>${p.harga}</span></p>
-        <p>Total harga: <span>${totalFormatted}</span></p>
-        <p>Alamat: <span>${alamat}</span></p>
-        ${catatan ? `<p>Catatan: <span>${catatan}</span></p>` : ""}
-        <p style="margin-top:10px;font-size:11px;color:var(--gray2)">${berhasil ? "✓ Data berhasil dicatat" : "⚠ Hubungi admin jika tidak ada konfirmasi"}</p>
+        <p>Total: <span>${totalFormatted}</span></p>
+        <p>Pembayaran: <span>${labelMetode}</span></p>
       </div>
-      <button class="btn-tutup" onclick="closeCheckoutDirect()">Tutup</button>
+      <a href="${waURL}" target="_blank" class="btn-wa-kirim">💬 Kirim ke WhatsApp Admin</a>
+      <p style="font-size:12px;color:var(--gray2);margin-top:8px">Jangan lupa lampirkan foto bukti pembayaran saat chat WA</p>
+      <button class="btn-tutup" onclick="closeCheckoutDirect()" style="margin-top:8px">Tutup</button>
     </div>`;
-  showToast("✅ Barang sudah diambil, pesanan tercatat!");
+  showToast("✅ Pesanan siap! Lanjut ke WhatsApp.");
 }
 
 
